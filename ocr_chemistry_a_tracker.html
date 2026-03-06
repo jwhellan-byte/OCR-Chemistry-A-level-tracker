@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>OCR Chemistry A Level A Progress Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: rgba(220, 38, 38, 0.3);
+        }
+        
+        html {
+            -webkit-text-size-adjust: 100%;
+            font-size: 16px;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            min-height: 100vh;
+            padding: 10px;
+            line-height: 1.5;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            color: #dc2626;
+            font-size: 1.5em;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+        
+        .subtitle {
+            color: #666;
+            font-size: 0.9em;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        
+        .info-box {
+            background: #fee2e2;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 0.85em;
+            border-left: 3px solid #dc2626;
+        }
+        
+        .progress-section {
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .progress-bar-container {
+            background: rgba(255,255,255,0.3);
+            height: 30px;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: #16a34a;
+            width: 0%;
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+            font-size: 0.85em;
+        }
+        
+        .stat {
+            background: rgba(255,255,255,0.2);
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 1.8em;
+            font-weight: bold;
+            display: block;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .btn {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: white;
+            background: #dc2626;
+            cursor: pointer;
+            min-height: 44px;
+            flex: 1 1 auto;
+            min-width: 120px;
+        }
+        
+        .btn-secondary {
+            background: #7f1d1d;
+        }
+        
+        .btn-tertiary {
+            background: #16a34a;
+        }
+        
+        .module {
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            border: 2px solid #e0e0e0;
+        }
+        
+        .module-header {
+            padding: 15px;
+            background: white;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            min-height: 60px;
+        }
+        
+        .module-header:active {
+            background: #f5f5f5;
+        }
+        
+        .module-title {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .toggle-icon {
+            font-size: 1.2em;
+            transition: transform 0.3s ease;
+        }
+        
+        .toggle-icon.open {
+            transform: rotate(180deg);
+        }
+        
+        .module-stats {
+            display: flex;
+            gap: 8px;
+            font-size: 0.75em;
+        }
+        
+        .module-stat {
+            padding: 4px 8px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        
+        .stat-complete {
+            background: #c8e6c9;
+            color: #2e7d32;
+        }
+        
+        .stat-practice {
+            background: #fff9c4;
+            color: #f57f17;
+        }
+        
+        .stat-review {
+            background: #ffcdd2;
+            color: #c62828;
+        }
+        
+        .module-content {
+            display: none;
+            padding: 10px;
+        }
+        
+        .module-content.open {
+            display: block;
+        }
+        
+        .topic {
+            background: white;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-left: 4px solid #dc2626;
+        }
+        
+        .topic-title {
+            font-weight: bold;
+            color: #dc2626;
+            margin-bottom: 10px;
+            font-size: 0.95em;
+        }
+        
+        .statement {
+            background: #f9f9f9;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 8px;
+            border: 2px solid #e0e0e0;
+        }
+        
+        .statement.complete {
+            background: #f1f8f4;
+            border-color: #4caf50;
+        }
+        
+        .statement.practice {
+            background: #fffef7;
+            border-color: #ff9800;
+        }
+        
+        .statement.review {
+            background: #fff5f5;
+            border-color: #f44336;
+        }
+        
+        .statement-text {
+            margin-bottom: 8px;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+        
+        .status-btns {
+            display: flex;
+            gap: 6px;
+        }
+        
+        .status-btn {
+            flex: 1;
+            padding: 8px;
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 6px;
+            font-size: 0.75em;
+            font-weight: 600;
+            cursor: pointer;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .status-btn:active {
+            transform: scale(0.98);
+        }
+        
+        .status-btn.active-complete {
+            background: #4caf50;
+            color: white;
+            border-color: #4caf50;
+        }
+        
+        .status-btn.active-practice {
+            background: #ff9800;
+            color: white;
+            border-color: #ff9800;
+        }
+        
+        .status-btn.active-review {
+            background: #f44336;
+            color: white;
+            border-color: #f44336;
+        }
+        
+        .legend {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 15px;
+            font-size: 0.85em;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #f8f9fa;
+            padding: 8px;
+            border-radius: 6px;
+        }
+        
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 3px;
+            flex-shrink: 0;
+        }
+        
+        @media (min-width: 600px) {
+            .container {
+                padding: 30px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            .stats {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            
+            .legend {
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⚗️ OCR Chemistry A Level A Tracker</h1>
+        <div class="subtitle">Specification H432 • Essential Statements</div>
+        
+        <div class="info-box">
+            <strong>💡 How to use:</strong> Track your learning! Tap Complete ✅, Practice ⚠️, or Review ❌ for each statement. Progress saves automatically.
+        </div>
+
+        <div class="progress-section">
+            <strong>📊 Your Progress</strong>
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="progressBar">0%</div>
+            </div>
+            <div class="stats">
+                <div class="stat">
+                    <span class="stat-number" id="completeCount">0</span>
+                    <span>Complete</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number" id="practiceCount">0</span>
+                    <span>Practice</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number" id="reviewCount">0</span>
+                    <span>Review</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number" id="notStartedCount">0</span>
+                    <span>Not Started</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn" onclick="expandAll()">📂 Expand All</button>
+            <button class="btn" onclick="collapseAll()">📁 Collapse All</button>
+            <button class="btn btn-tertiary" onclick="exportData()">💾 Export</button>
+            <button class="btn btn-secondary" onclick="resetAll()">🔄 Reset</button>
+        </div>
+
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color" style="background: #4caf50;"></div>
+                <span><strong>Complete:</strong> Confident</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #ff9800;"></div>
+                <span><strong>Practice:</strong> Need work</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #f44336;"></div>
+                <span><strong>Review:</strong> Need study</span>
+            </div>
+        </div>
+
+        <div id="modules"></div>
+    </div>
+
+    <script>
+        const data = {
+            "Module 2: Foundations in Chemistry": {
+                "2.1.1 Atomic Structure & Isotopes": [
+                    "I understand isotopes as atoms with different numbers of neutrons",
+                    "I can determine atomic structure from atomic and mass numbers",
+                    "I can explain relative isotopic mass and relative atomic mass (Ar)",
+                    "I can use mass spectra to calculate Ar from isotope abundances",
+                    "I understand relative molecular mass (Mr) and relative formula mass"
+                ],
+                "2.1.2 Amount of Substance": [
+                    "I understand the mole as the unit for amount of substance (mol)",
+                    "I know Avogadro's constant: 6.02 × 10²³ particles per mole",
+                    "I can calculate empirical and molecular formulae from composition",
+                    "I can calculate formulae of hydrated salts including water of crystallisation",
+                    "I can perform mole calculations involving mass, gas volume (ideal gas equation pV=nRT)",
+                    "I can perform mole calculations involving solution concentration (mol dm⁻³)",
+                    "I can calculate percentage yield and atom economy"
+                ],
+                "2.1.3 Acids & Titrations": [
+                    "I understand acids release H⁺ ions, alkalis release OH⁻ ions",
+                    "I can explain strong vs weak acids in terms of dissociation",
+                    "I can write equations for neutralisation: H⁺ + OH⁻ → H₂O",
+                    "I can prepare standard solutions and carry out acid-base titrations",
+                    "I can perform titration calculations (structured and non-structured)"
+                ],
+                "2.1.4 Redox": [
+                    "I can assign and calculate oxidation numbers",
+                    "I can write formulae using oxidation numbers (e.g., iron(II), iron(III))",
+                    "I understand oxidation as electron loss, reduction as electron gain",
+                    "I can write half-equations for redox reactions",
+                    "I can interpret redox reactions using oxidation numbers"
+                ],
+                "2.2.1 Electron Structure": [
+                    "I know the number of electrons in shells 1-4",
+                    "I understand atomic orbitals (s, p, d) and their shapes",
+                    "I can fill orbitals in order of increasing energy",
+                    "I can write electron configurations for atoms up to Z=36 (e.g., 1s² 2s² 2p⁶)",
+                    "I can write electron configurations for s- and p-block ions"
+                ],
+                "2.2.2 Bonding & Structure": [
+                    "I understand ionic bonding as electrostatic attraction between ions",
+                    "I can draw dot-and-cross diagrams for ionic compounds",
+                    "I can explain properties of ionic compounds (melting point, conductivity, solubility)",
+                    "I understand covalent bonds as shared electron pairs",
+                    "I can draw dot-and-cross diagrams for covalent bonds (including dative)",
+                    "I can use VSEPR to predict molecular shapes and bond angles",
+                    "I understand electronegativity and can identify polar bonds and molecules",
+                    "I can explain intermolecular forces: dipole-dipole, London forces, hydrogen bonding",
+                    "I can explain properties of simple molecular compounds",
+                    "I understand metallic bonding and properties of metals",
+                    "I understand giant covalent structures (diamond, graphite, graphene, silicon)"
+                ]
+            },
+            "Module 3: Periodic Table and Energy": {
+                "3.1.1 Periodicity": [
+                    "I understand the periodic table is arranged by atomic number",
+                    "I can classify elements into s-, p-, and d-blocks",
+                    "I understand first ionisation energy and can write equations",
+                    "I can explain trends in ionisation energy across periods and down groups",
+                    "I can use successive ionisation energies to predict electron shell structure",
+                    "I can explain the trend in melting points across Periods 2 and 3"
+                ],
+                "3.1.2 Group 2": [
+                    "I understand Group 2 elements have s² outer configuration and form 2+ ions",
+                    "I know reactivity increases down Group 2 (Mg → Ba)",
+                    "I can write equations for reactions with oxygen, water, and dilute acids",
+                    "I can explain the trend in reactivity using ionisation energies",
+                    "I understand Group 2 oxides react with water to form alkaline solutions",
+                    "I know uses of Group 2 compounds: Ca(OH)₂ for soil, Mg(OH)₂/CaCO₃ as antacids"
+                ],
+                "3.1.3 The Halogens": [
+                    "I can explain the trend in boiling points (Cl₂, Br₂, I₂) using London forces",
+                    "I understand halogens have s²p⁵ configuration and form 1− ions",
+                    "I understand reactivity decreases down Group 7 (Cl₂ > Br₂ > I₂)",
+                    "I can write equations for halogen displacement reactions",
+                    "I understand disproportionation of chlorine in water and NaOH (used in bleach)",
+                    "I can test for halide ions using AgNO₃ followed by NH₃"
+                ],
+                "3.1.4 Qualitative Analysis": [
+                    "I can test for CO₃²⁻ (add acid, produces CO₂)",
+                    "I can test for SO₄²⁻ (add Ba²⁺, white precipitate)",
+                    "I can test for halides: Cl⁻, Br⁻, I⁻ (AgNO₃ then NH₃)",
+                    "I can test for NH₄⁺ (warm with NaOH, produces NH₃)"
+                ],
+                "3.2.1 Enthalpy Changes": [
+                    "I can explain exothermic (ΔH negative) and endothermic (ΔH positive) reactions",
+                    "I can draw enthalpy profile diagrams showing activation energy",
+                    "I know definitions: ΔfH (formation), ΔcH (combustion), ΔneutH (neutralisation)",
+                    "I can calculate enthalpy changes using q = mcΔT",
+                    "I understand average bond enthalpy and can use bond enthalpies in calculations",
+                    "I can use Hess' law to construct enthalpy cycles",
+                    "I can calculate ΔrH using ΔfH or ΔcH values"
+                ],
+                "3.2.2 Reaction Rates": [
+                    "I can explain effect of concentration/pressure on rate (collision theory)",
+                    "I can calculate reaction rate from gradients of graphs",
+                    "I understand catalysts lower activation energy and increase rate",
+                    "I can explain homogeneous and heterogeneous catalysts",
+                    "I can explain the Boltzmann distribution",
+                    "I can use Boltzmann distribution to explain effect of temperature and catalysts on rate"
+                ],
+                "3.2.3 Chemical Equilibrium": [
+                    "I understand dynamic equilibrium: forward rate = reverse rate",
+                    "I can apply Le Chatelier's principle to predict effects of changes",
+                    "I understand catalysts don't change position of equilibrium",
+                    "I can write Kc expressions and calculate Kc from equilibrium concentrations",
+                    "I can estimate position of equilibrium from magnitude of Kc"
+                ]
+            },
+            "Module 4: Core Organic Chemistry": {
+                "4.1.1 Basic Concepts": [
+                    "I can name organic compounds using IUPAC nomenclature",
+                    "I understand general, structural, displayed, and skeletal formulae",
+                    "I understand functional groups and homologous series",
+                    "I can distinguish aliphatic, alicyclic, aromatic, saturated, unsaturated",
+                    "I understand structural isomers and can draw them",
+                    "I understand homolytic fission (radicals) and heterolytic fission",
+                    "I can use curly arrows to show electron pair movement in mechanisms"
+                ],
+                "4.1.2 Alkanes": [
+                    "I understand alkanes have C-C and C-H σ-bonds with free rotation",
+                    "I can explain tetrahedral shape around each carbon (109.5°)",
+                    "I can explain variations in boiling points using London forces",
+                    "I understand low reactivity of alkanes (strong C-H bonds, low polarity)",
+                    "I can write equations for complete and incomplete combustion",
+                    "I can write the mechanism for radical substitution with halogens",
+                    "I understand limitations of radical substitution (mixture of products)"
+                ],
+                "4.1.3 Alkenes": [
+                    "I understand alkenes have C=C with σ-bond and π-bond (restricted rotation)",
+                    "I can explain trigonal planar shape around C=C (120°)",
+                    "I understand E/Z isomerism and can use CIP priority rules",
+                    "I can identify E/Z and cis-trans stereoisomers",
+                    "I can explain reactivity in terms of π-bond strength",
+                    "I can write equations for addition of H₂, Br₂, HBr, H₂O (steam)",
+                    "I understand electrophilic addition mechanism",
+                    "I can use Markownikoff's rule to predict major products",
+                    "I understand addition polymerisation and can identify monomers/polymers",
+                    "I know methods of processing waste polymers for sustainability"
+                ],
+                "4.2.1 Alcohols": [
+                    "I can explain polarity, water solubility, and low volatility using hydrogen bonding",
+                    "I can classify alcohols as primary, secondary, or tertiary",
+                    "I can write equations for combustion of alcohols",
+                    "I can write equations for oxidation: primary → aldehyde → carboxylic acid",
+                    "I can write equations for oxidation: secondary → ketone",
+                    "I know tertiary alcohols resist oxidation",
+                    "I can write equations for elimination to form alkenes (dehydration)",
+                    "I can write equations for substitution with halides to form haloalkanes"
+                ],
+                "4.2.2 Haloalkanes": [
+                    "I can write equations for hydrolysis with OH⁻ or H₂O to form alcohols",
+                    "I understand nucleophilic substitution mechanism (SN2)",
+                    "I can explain trend in hydrolysis rates using C-X bond enthalpies",
+                    "I understand CFCs produce halogen radicals that catalyse ozone breakdown",
+                    "I can write equations for ozone depletion by radicals"
+                ],
+                "4.2.3 Organic Synthesis": [
+                    "I can use Quickfit apparatus for distillation and heating under reflux",
+                    "I can purify organic liquids (separating funnel, drying, redistillation)",
+                    "I can identify functional groups in polyfunctional molecules",
+                    "I can devise two-stage synthetic routes between functional groups"
+                ],
+                "4.2.4 Analytical Techniques": [
+                    "I understand IR radiation causes bonds to vibrate and absorb energy",
+                    "I can use IR spectra to identify O-H, C=O, C-H bonds",
+                    "I can identify molecular ion peak (M⁺) in mass spectra to find Mr",
+                    "I can analyse fragmentation patterns in mass spectra",
+                    "I can deduce structures using combined IR and MS data"
+                ]
+            },
+            "Module 5: Physical Chemistry & Transition Elements": {
+                "5.1.1 Rates & Rate Equations": [
+                    "I understand order of reaction, rate constant (k), and half-life",
+                    "I can determine orders from experimental data and write rate equations",
+                    "I can calculate k and its units from rate equations",
+                    "I can use concentration-time graphs to determine order and rate",
+                    "I can measure half-life for first-order reactions and calculate k = ln2/t½",
+                    "I can use rate-concentration graphs to determine order",
+                    "I can predict rate equations from rate-determining step",
+                    "I understand the Arrhenius equation: k = Ae^(-Ea/RT)",
+                    "I can determine Ea from a graph of ln k vs 1/T"
+                ],
+                "5.1.2 Equilibrium Constants": [
+                    "I understand mole fraction and partial pressure",
+                    "I can write Kc and Kp expressions for homogeneous/heterogeneous equilibria",
+                    "I can calculate Kc and Kp including units",
+                    "I understand effect of temperature on K (exothermic vs endothermic)",
+                    "I understand K is constant with changes in concentration, pressure, or catalyst"
+                ],
+                "5.1.3 Acids, Bases & Buffers": [
+                    "I understand Brønsted-Lowry acids (proton donors) and bases (proton acceptors)",
+                    "I can identify conjugate acid-base pairs",
+                    "I understand Ka (acid dissociation constant) and pKa = -log Ka",
+                    "I can calculate pH using pH = -log[H⁺]",
+                    "I understand Kw (ionic product of water)",
+                    "I can calculate pH of strong acids and strong bases (using Kw)",
+                    "I can calculate pH of weak acids using approximations",
+                    "I understand buffer solutions minimize pH changes",
+                    "I can explain how acid buffers work (weak acid + conjugate base)",
+                    "I can calculate pH of buffer solutions",
+                    "I can sketch and interpret pH titration curves",
+                    "I can explain indicator choice based on pH range"
+                ],
+                "5.2.1 Lattice Enthalpy": [
+                    "I understand lattice enthalpy (ΔleH) as formation of ionic lattice from gaseous ions",
+                    "I can construct Born-Haber cycles",
+                    "I can perform calculations using Born-Haber cycles",
+                    "I understand enthalpy of solution (ΔsolH) and hydration (ΔhydH)",
+                    "I can construct enthalpy cycles for dissolving ionic solids",
+                    "I can explain effect of ionic charge and radius on lattice enthalpy"
+                ],
+                "5.2.2 Entropy & Free Energy": [
+                    "I understand entropy (S) as a measure of disorder",
+                    "I can compare entropy of solids, liquids, and gases",
+                    "I can calculate ΔS for a reaction from given values",
+                    "I understand feasibility depends on ΔG = ΔH - TΔS",
+                    "I can calculate ΔG and predict feasibility (ΔG < 0 is feasible)",
+                    "I understand limitations: feasibility doesn't guarantee it happens (kinetics)"
+                ],
+                "5.2.3 Redox & Electrode Potentials": [
+                    "I can construct redox equations using half-equations",
+                    "I can perform redox titrations (Fe²⁺/MnO₄⁻, I₂/S₂O₃²⁻)",
+                    "I can perform structured and non-structured redox titration calculations",
+                    "I understand standard electrode potential (E°)",
+                    "I can calculate standard cell potential: E°cell = E°(+ve) - E°(-ve)",
+                    "I can predict feasibility using E°cell (positive = feasible)",
+                    "I understand limitations: kinetics and concentration affect feasibility",
+                    "I can apply principles to storage cells and fuel cells"
+                ],
+                "5.3.1 Transition Elements": [
+                    "I can write electron configurations for d-block elements and ions",
+                    "I understand transition elements have incomplete d-sub-shell ions",
+                    "I know transition elements show: variable oxidation states, coloured ions, catalytic behaviour",
+                    "I understand ligands form coordinate bonds to metal ions",
+                    "I can explain coordination number and complex ion shapes (octahedral, tetrahedral, square planar)",
+                    "I understand stereoisomerism in complexes: cis-trans and optical isomerism",
+                    "I can write equations for ligand substitution reactions",
+                    "I can explain colour changes in ligand substitution",
+                    "I can write equations for precipitation reactions with NaOH and NH₃",
+                    "I can explain complex formation with excess NaOH and NH₃",
+                    "I can write equations for redox reactions: Fe²⁺/Fe³⁺, Cr³⁺/Cr₂O₇²⁻, Cu²⁺/Cu⁺",
+                    "I can test for transition metal ions using NaOH and NH₃"
+                ]
+            },
+            "Module 6: Organic Chemistry & Analysis": {
+                "6.1.1 Aromatic Compounds": [
+                    "I understand benzene structure: delocalised electrons, planar hexagon",
+                    "I can explain benzene stability using enthalpy of hydrogenation",
+                    "I understand benzene undergoes electrophilic substitution (not addition)",
+                    "I can write equations and mechanisms for: halogenation, nitration, Friedel-Crafts"
+                ],
+                "6.2.1 Carbonyl Compounds": [
+                    "I can distinguish aldehydes and ketones",
+                    "I can write equations for oxidation of aldehydes to carboxylic acids",
+                    "I can use Fehling's and Tollens' reagent to test for aldehydes",
+                    "I can write equations for reaction with HCN to form cyanohydrins",
+                    "I understand nucleophilic addition mechanism with CN⁻"
+                ],
+                "6.2.2 Carboxylic Acids & Esters": [
+                    "I can explain acidic properties of carboxylic acids",
+                    "I can write equations for reactions with metals, alkalis, carbonates",
+                    "I can write equations for esterification (acid + alcohol)",
+                    "I can write equations for hydrolysis of esters (acid or base catalysed)"
+                ],
+                "6.2.3 Nitrogen Compounds": [
+                    "I understand amines as bases (lone pair accepts H⁺)",
+                    "I can write equations for reactions of amines with acids",
+                    "I can explain amino acids have both acidic and basic groups",
+                    "I understand amino acids exist as zwitterions",
+                    "I can write equations for condensation to form amides (peptide bonds)",
+                    "I understand optical isomerism in molecules with chiral centres",
+                    "I can identify chiral centres and draw enantiomers"
+                ],
+                "6.2.4 Polymers": [
+                    "I understand addition polymers from alkenes",
+                    "I understand condensation polymers from: diols + dicarboxylic acids (polyesters)",
+                    "I understand condensation polymers from: diamines + dicarboxylic acids (polyamides)",
+                    "I can identify monomers from polymer structure and vice versa",
+                    "I can write equations for hydrolysis of polyesters and polyamides"
+                ],
+                "6.3.1 Organic Synthesis": [
+                    "I can devise multi-step synthetic routes",
+                    "I can identify target molecules and starting materials",
+                    "I can select appropriate reagents and conditions"
+                ],
+                "6.3.2 Chromatography & Spectroscopy": [
+                    "I understand thin layer chromatography (TLC) and can calculate Rf values",
+                    "I understand gas chromatography (GC) principles and retention times",
+                    "I can interpret ¹H NMR spectra: chemical shift, integration, splitting patterns (n+1 rule)",
+                    "I can interpret ¹³C NMR spectra: number of carbon environments",
+                    "I can use combined techniques (MS, IR, NMR) to deduce structures"
+                ]
+            }
+        };
+
+        let stateData = {};
+
+        function init() {
+            loadState();
+            renderModules();
+            updateStats();
+        }
+
+        function renderModules() {
+            const container = document.getElementById('modules');
+            container.innerHTML = '';
+            
+            Object.keys(data).forEach((moduleName, moduleIndex) => {
+                const moduleDiv = document.createElement('div');
+                moduleDiv.className = 'module';
+                moduleDiv.innerHTML = `
+                    <div class="module-header" onclick="toggleModule(${moduleIndex})">
+                        <div class="module-title">
+                            <span class="toggle-icon" id="icon-${moduleIndex}">▼</span>
+                            <span>${moduleName}</span>
+                        </div>
+                        <div class="module-stats">
+                            <span class="module-stat stat-complete" id="mod-complete-${moduleIndex}">0</span>
+                            <span class="module-stat stat-practice" id="mod-practice-${moduleIndex}">0</span>
+                            <span class="module-stat stat-review" id="mod-review-${moduleIndex}">0</span>
+                        </div>
+                    </div>
+                    <div class="module-content" id="content-${moduleIndex}">
+                        ${renderTopics(data[moduleName], moduleIndex)}
+                    </div>
+                `;
+                container.appendChild(moduleDiv);
+            });
+        }
+
+        function renderTopics(topics, moduleIndex) {
+            let html = '';
+            Object.keys(topics).forEach((topicName, topicIndex) => {
+                html += `<div class="topic">
+                    <div class="topic-title">${topicName}</div>`;
+                topics[topicName].forEach((statement, stmtIndex) => {
+                    const id = `${moduleIndex}-${topicIndex}-${stmtIndex}`;
+                    const state = stateData[id] || 'none';
+                    html += `
+                        <div class="statement ${state}" id="stmt-${id}">
+                            <div class="statement-text">${statement}</div>
+                            <div class="status-btns">
+                                <button class="status-btn ${state === 'complete' ? 'active-complete' : ''}" 
+                                    onclick="setState('${id}', 'complete')">✅</button>
+                                <button class="status-btn ${state === 'practice' ? 'active-practice' : ''}" 
+                                    onclick="setState('${id}', 'practice')">⚠️</button>
+                                <button class="status-btn ${state === 'review' ? 'active-review' : ''}" 
+                                    onclick="setState('${id}', 'review')">❌</button>
+                            </div>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+            });
+            return html;
+        }
+
+        function toggleModule(index) {
+            const content = document.getElementById('content-' + index);
+            const icon = document.getElementById('icon-' + index);
+            
+            if (content.classList.contains('open')) {
+                content.classList.remove('open');
+                icon.classList.remove('open');
+            } else {
+                content.classList.add('open');
+                icon.classList.add('open');
+            }
+        }
+
+        function setState(id, status) {
+            if (stateData[id] === status) {
+                stateData[id] = 'none';
+            } else {
+                stateData[id] = status;
+            }
+            
+            saveState();
+            
+            const stmt = document.getElementById('stmt-' + id);
+            stmt.className = 'statement ' + stateData[id];
+            
+            const btns = stmt.querySelectorAll('.status-btn');
+            btns[0].className = 'status-btn' + (stateData[id] === 'complete' ? ' active-complete' : '');
+            btns[1].className = 'status-btn' + (stateData[id] === 'practice' ? ' active-practice' : '');
+            btns[2].className = 'status-btn' + (stateData[id] === 'review' ? ' active-review' : '');
+            
+            updateStats();
+        }
+
+        function updateStats() {
+            let complete = 0, practice = 0, review = 0, total = 0;
+            
+            Object.keys(data).forEach((moduleName, moduleIndex) => {
+                let modComplete = 0, modPractice = 0, modReview = 0;
+                
+                Object.keys(data[moduleName]).forEach((topicName, topicIndex) => {
+                    data[moduleName][topicName].forEach((stmt, stmtIndex) => {
+                        const id = `${moduleIndex}-${topicIndex}-${stmtIndex}`;
+                        const state = stateData[id] || 'none';
+                        total++;
+                        
+                        if (state === 'complete') { complete++; modComplete++; }
+                        else if (state === 'practice') { practice++; modPractice++; }
+                        else if (state === 'review') { review++; modReview++; }
+                    });
+                });
+                
+                document.getElementById('mod-complete-' + moduleIndex).textContent = modComplete;
+                document.getElementById('mod-practice-' + moduleIndex).textContent = modPractice;
+                document.getElementById('mod-review-' + moduleIndex).textContent = modReview;
+            });
+            
+            const notStarted = total - complete - practice - review;
+            const percent = Math.round((complete / total) * 100);
+            
+            document.getElementById('completeCount').textContent = complete;
+            document.getElementById('practiceCount').textContent = practice;
+            document.getElementById('reviewCount').textContent = review;
+            document.getElementById('notStartedCount').textContent = notStarted;
+            document.getElementById('progressBar').style.width = percent + '%';
+            document.getElementById('progressBar').textContent = percent + '%';
+        }
+
+        function expandAll() {
+            Object.keys(data).forEach((_, index) => {
+                document.getElementById('content-' + index).classList.add('open');
+                document.getElementById('icon-' + index).classList.add('open');
+            });
+        }
+
+        function collapseAll() {
+            Object.keys(data).forEach((_, index) => {
+                document.getElementById('content-' + index).classList.remove('open');
+                document.getElementById('icon-' + index).classList.remove('open');
+            });
+        }
+
+        function saveState() {
+            try {
+                localStorage.setItem('ocrChemATracker', JSON.stringify(stateData));
+            } catch (e) {
+                console.error('Save failed:', e);
+            }
+        }
+
+        function loadState() {
+            try {
+                const saved = localStorage.getItem('ocrChemATracker');
+                if (saved) {
+                    stateData = JSON.parse(saved);
+                }
+            } catch (e) {
+                console.error('Load failed:', e);
+                stateData = {};
+            }
+        }
+
+        function exportData() {
+            const exportObj = {
+                date: new Date().toISOString(),
+                name: prompt('Your name (optional):') || 'Student',
+                spec: 'OCR Chemistry A Level A H432',
+                data: stateData
+            };
+            
+            const blob = new Blob([JSON.stringify(exportObj, null, 2)], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'OCR_Chemistry_A_' + new Date().toISOString().split('T')[0] + '.json';
+            a.click();
+            
+            alert('Progress exported! Save this file to backup your data.');
+        }
+
+        function resetAll() {
+            if (confirm('Reset ALL progress? This cannot be undone!')) {
+                stateData = {};
+                saveState();
+                renderModules();
+                updateStats();
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>
